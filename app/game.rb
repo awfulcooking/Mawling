@@ -1,6 +1,8 @@
 Maw!
 
-controls.define :do_fn_each_send, keyboard: :space
+controls.define :dont_fn_each_send, keyboard: :space
+controls.define :reset, keyboard: :r
+controls.define :quit, keyboard: :q
 
 init {
   $state.particle_system = ParticleSystem.new
@@ -8,6 +10,13 @@ init {
 }
 
 tick {
+  exit if controls.quit?
+
+  if controls.reset?
+    $gtk.reset(seed: rand(10000000))
+    next
+  end
+
   if tick_count % 120 == 0
     current_time = Time.now
     diff_ticks = tick_count - $state.prev_ticks
@@ -16,6 +25,7 @@ tick {
     $state.prev_time = current_time
   end
 
+  outputs.debug << $gtk.framerate_diagnostics_primitives
   $state.particle_system.process_inputs
 }
 
@@ -26,7 +36,6 @@ def process_item i
 end
 
 class ParticleSystem
-  attr_accessor :should_fn_each_send
   def initialize
     @width = 5
     @particles = 1000.times.map do
@@ -84,8 +93,13 @@ class ParticleSystem
   def draw_override ffi_draw
     @ffi_draw = ffi_draw
 
-    fn.each_send @particles, self, :process_particle
-    fn.each_send @particles2, self, :process_particle
+    if !controls.dont_fn_each_send?
+      fn.each_send @particles, self, :process_particle
+      fn.each_send @particles2, self, :process_particle
+    else
+      @particles.each { |p| process_particle p }
+      @particles2.each { |p| process_particle p }
+    end
   end
 end
 
