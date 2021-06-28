@@ -16,7 +16,7 @@ tick {
     $state.prev_time = current_time
   end
 
-  $state.particle_system.process_inputs args
+  $state.particle_system.process_inputs
 }
 
 def process_item i
@@ -49,7 +49,7 @@ class ParticleSystem
   end
 
   
-  def process_inputs args
+  def process_inputs
     mouse = inputs.mouse
     @mouse_focus = mouse.has_focus
     @mouse_x = mouse.x + 200 * tick_count.sin
