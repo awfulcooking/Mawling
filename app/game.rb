@@ -5,13 +5,9 @@ controls.define :do_fn_each_send, keyboard: :space
 init {
   $state.particle_system = ParticleSystem.new
   outputs.static_sprites << $state.particle_system
-  puts "Init done"
 }
 
 tick {
-  puts "Tick 1"
-  next
-
   if tick_count % 120 == 0
     current_time = Time.now
     diff_ticks = tick_count - $state.prev_ticks
@@ -19,8 +15,6 @@ tick {
     $state.prev_ticks = tick_count
     $state.prev_time = current_time
   end
-
-  puts "Tick 2"
 
   $state.particle_system.process_inputs args
 }
