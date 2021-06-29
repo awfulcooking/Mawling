@@ -1,8 +1,9 @@
 Maw!
 
-controls.define :dont_fn_each_send, keyboard: :space
 controls.define :reset, keyboard: :r
 controls.define :quit, keyboard: :q
+
+controls.define :debug_framerate, keyboard: :f
 
 init {
   $state.particle_system = ParticleSystem.new
@@ -25,7 +26,8 @@ tick {
     $state.prev_time = current_time
   end
 
-  outputs.debug << $gtk.framerate_diagnostics_primitives
+  outputs.debug << $gtk.framerate_diagnostics_primitives if controls.debug_framerate?
+
   $state.particle_system.process_inputs
 }
 
@@ -93,13 +95,8 @@ class ParticleSystem
   def draw_override ffi_draw
     @ffi_draw = ffi_draw
 
-    if !controls.dont_fn_each_send?
-      fn.each_send @particles, self, :process_particle
-      fn.each_send @particles2, self, :process_particle
-    else
-      @particles.each { |p| process_particle p }
-      @particles2.each { |p| process_particle p }
-    end
+    fn.each_send @particles, self, :process_particle
+    fn.each_send @particles2, self, :process_particle
   end
 end
 
